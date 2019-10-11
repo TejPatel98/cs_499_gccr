@@ -13,7 +13,7 @@ class stocks extends Controller
 		{
 			echo \FSSCLE::test();
 		}
-		catch($e)
+		catch(FSSNotFoundException $e)
 		{
 			echo $exception->getMessage();
 		}
