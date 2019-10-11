@@ -179,6 +179,9 @@ return [
 
         // Custom
         Collective\Html\HtmlServiceProvider::class,
+
+		// Custom Implementation
+		App\Providers\FSSServiceProvider::class,
     ],
 
     /*
@@ -232,6 +235,8 @@ return [
 
         'Form' => Collective\Html\FormFacade::class,
         'Html' => Collective\Html\HtmlFacade::class,
+
+		'FSSCLE' => App\Custom\FishbackStockScanner\FSSFacade::class,
     ],
 
 ];

@@ -8,6 +8,14 @@ class stocks extends Controller
 {
 	public function submitSelection(Request $request)
 	{
-		dd($request->all());
+
+		try
+		{
+			echo \FSSCLE::test();
+		}
+		catch($e)
+		{
+			echo $exception->getMessage();
+		}
 	}
 }
