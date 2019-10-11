@@ -42,6 +42,6 @@ class CommandLineExecutor
 
 		$command = implode(" ", $command_parts);
 
-		return shell_exec('ls -la');
+		return shell_exec($command);
 	}
 }
