@@ -13,8 +13,8 @@
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
-Route::view('/stock', 'stocks/select');
+Route::view('/stock', 'stocks/select')->name('stock.select');
 
-Route::post('/stock/submit', 'stocks@submitSelection');
+Route::post('/stock/submit', 'stocks@submitSelection')->name('stock.submit');
