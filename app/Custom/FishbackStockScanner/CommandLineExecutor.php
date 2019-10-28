@@ -25,12 +25,12 @@ class CommandLineExecutor
 			throw new FSSNotFoundException('The FishbackStockScanner program was not found.');
 		}
 
-		$dateParam = "-date=" . $date;
+		$date_param = "-date=" . $date;
 
 		$command_parts = array();
 
 		$command_parts[] = $filename;
-		$command_parts[] = $dateParam;
+		$command_parts[] = $date_param;
 		$command_parts[] = "-sessionID=appopttablewide";
 		$command_parts[] = "-minVolRatio=.03";
 		$command_parts[] = "-maxVolRatio=2";
@@ -46,6 +46,8 @@ class CommandLineExecutor
 
 		$command = implode(" ", $command_parts);
 
-		return shell_exec($command);
+        $shell_output = shell_exec($command);
+
+        return str_getcsv($shell_output);
 	}
 }
