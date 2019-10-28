@@ -2,20 +2,22 @@
 
 namespace App\Custom\FishbackStockScanner;
 
-use App\Exception\FSSNotFoundException;
+use App\Exceptions\FSSNotFoundException;
+use App\Exceptions\InvalidDateFormat;
 
 class CommandLineExecutor
 {
-	public function lsTest()
+	public function VolitilityHVIVDifference($date)
 	{
-		return shell_exec('ls -la');
-	}
+        $filename = "/home/ukfl2019/FishbackStockScanner";
 
-	public function test()
-	{
-		$filename = "/home/ukfl2019/FishbackStockScanner";
+	    // If the date format isn't YYYY-MM-DD then throw an error.
+		if (!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $date))
+		{
+		    throw new InvalidDateFormat('The date format need to be YYYY-MM-DD');
+		}
 
-		// Check to see if the program exists.
+		// To see if the program exists.
 		// If not it's probably because you're on your local machine
 		// and not the server
 		if(!file_exists($filename))
@@ -23,10 +25,12 @@ class CommandLineExecutor
 			throw new FSSNotFoundException('The FishbackStockScanner program was not found.');
 		}
 
+		$dateParam = "-date=" . $date;
+
 		$command_parts = array();
 
 		$command_parts[] = $filename;
-		$command_parts[] = "-date=2013-03-19";
+		$command_parts[] = $dateParam;
 		$command_parts[] = "-sessionID=appopttablewide";
 		$command_parts[] = "-minVolRatio=.03";
 		$command_parts[] = "-maxVolRatio=2";
