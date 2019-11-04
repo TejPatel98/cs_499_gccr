@@ -48,6 +48,31 @@ class CommandLineExecutor
 
         $shell_output = shell_exec($command);
 
+
+		// These next few lines should parse the CSV file.
+		$options = [];
+		$prices = [];
+		$optionsPrice = [];
+		
+		$temp = explode("\n", $shell_output);
+		foreach($temp as $t)
+		{
+			if($t != '')
+			{
+				$option = explode(",", $t)[1];
+				$price = explode(",", $t)[2];
+				$options[] = $option;
+				$prices[] = $price;
+				$optionsPrice[$option]=$price;
+			}
+		}
+
+		for ($y = 0; $y < count($options); $y++)
+		{
+			echo "the option title is: ".$options[$y]." and its price is: ".$prices[$y];
+			echo "<br>\n";
+		}
+
         return str_getcsv($shell_output);
 	}
 }

@@ -23,8 +23,6 @@ class stocks extends Controller
 		try
 		{
 			$stockResults = \FSSCLE::VolitilityHVIVDifference($request->input('start_date'));
-
-		    dd($stockResults);
 		}
 		catch(FSSNotFoundException $e)
 		{
@@ -34,5 +32,7 @@ class stocks extends Controller
         {
             echo $e->getMessage();
         }
+
+		echo $stockResults;
 	}
 }
