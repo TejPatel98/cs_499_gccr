@@ -9,7 +9,7 @@ class CommandLineExecutor
 {
 	public function VolitilityHVIVDifference($date)
 	{
-        $filename = "/home/ukfl2019/FishbackStockScanner";
+        $filename = config('scan.scan_program');
 
 	    // If the date format isn't YYYY-MM-DD then throw an error.
 		if (!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $date))
