@@ -27,7 +27,7 @@ class CommandLineExecutor
 
 		$date_param = "-date=" . $date;
 
-		$command_parts = array();
+		$command_parts = [];
 
 		$command_parts[] = $filename;
 		$command_parts[] = $date_param;
@@ -48,21 +48,18 @@ class CommandLineExecutor
 
         $shell_output = shell_exec($command);
 
-
 		// These next few lines should parse the CSV file.
 		$results = [];
-		$results['id'] = [];
-		$results['name'] = [];
-		$results['price'] = [];
-
 		$temp = explode("\n", $shell_output);
 		foreach($temp as $t)
 		{
 			if($t != '')
 			{
-				$results['id'][] = explode(",", $t)[0];
-				$results['name'][] = explode(",", $t)[1];
-				$results['price'][] = explode(",", $t)[2];
+				$results[] = [
+                    'id' =>     explode(",", $t)[0],
+                    'name' =>  explode(",", $t)[1],
+                    'price' =>   explode(",", $t)[2],
+                ];
 			}
 		}
 

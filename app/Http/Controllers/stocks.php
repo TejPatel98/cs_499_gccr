@@ -18,7 +18,6 @@ class stocks extends Controller
 	    $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
 
-		/*
 	    $dateResults = DB::connection('ovs')->select("SELECT * FROM `ovscalendar` where calType = '2' and date_ BETWEEN ? and ? order by date_ asc", [$startDate, $endDate]);
 
 		try
@@ -33,22 +32,24 @@ class stocks extends Controller
         {
             echo $e->getMessage();
         }
-		*/
 
 		$date = $request->input('start_date');
 
-		// You cannot use named bindings multiple times in the same query.
-		// There must be an individual named binding for each spot.
-		$arguments = [
-			'date1' => $date,
-			'date2' => $date,
-			'date3' => $date,
-			'days_to_exp' => 5,
-			'eq_id' => 303,
-			'p_c' => 'C',
-		];
+		for($i = 0; $i < 5; $i++)
+		{
+            // You cannot use named bindings multiple times in the same query.
+            // There must be an individual named binding for each spot.
 
-		$query = '
+            $arguments = [
+                'date1' => $date,
+                'date2' => $date,
+                'date3' => $date,
+                'days_to_exp' => 5,
+                'eq_id' => $stockResults[$i]['id'],
+                'p_c' => 'C',
+            ];
+
+            $query = '
 			SELECT 
 				oc.eqId,
 				DATEDIFF(oc.expDate, :date1) AS daysToExp, 
@@ -71,9 +72,12 @@ class stocks extends Controller
 
 			ORDER by oc.strike ASC, oc.expDate ASC
 			';
-		
-		$testResult = DB::connection('ovs')->select($query, $arguments);
 
-		dd($testResult);
+            $callResult = DB::connection('ovs')->select($query, $arguments);
+
+            $callResults[] = $callResult;
+        }
+
+		dd($callResults);
 	}
 }
