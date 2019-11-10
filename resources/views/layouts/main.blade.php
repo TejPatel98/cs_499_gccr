@@ -17,6 +17,10 @@
 
 		<!-- Bootstrap core CSS -->
 		<link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
+
+		<!-- Chart.js CDN -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+
     </head>
     <body>
 		

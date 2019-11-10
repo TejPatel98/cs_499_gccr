@@ -5,7 +5,7 @@
 <div class="container">
 	<div class="card">
 		<div class="card-header">
-			<h1>Stocks</h1>
+			<h1>Portfolio Setup</h1>
 		</div>
 		<div class="card-body">
 			<div class="row">
@@ -14,7 +14,7 @@
 
 					<div class="form-group">
 						{!! Form::label('strategy', 'Strategy') !!}
-						{!! Form::select('strategy', array('strategy_one' => 'Strategy One', 'strategy_two' => 'Strategy Two', 'strategy_three' => 'Strategy Three'), ['class' => 'form-control']) !!}
+						{!! Form::select('strategy', array('strategy_one' => 'Buy Call', 'strategy_two' => 'Buy Put'), ['class' => 'form-control']) !!}
 					</div>
 
 					<div class="form-group">
