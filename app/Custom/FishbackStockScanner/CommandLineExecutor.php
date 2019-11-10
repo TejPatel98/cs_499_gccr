@@ -56,9 +56,9 @@ class CommandLineExecutor
 			if($t != '')
 			{
 				$results[] = [
-                    'id' =>     explode(",", $t)[0],
+                    'id' =>     (int)explode(",", $t)[0],
                     'name' =>  explode(",", $t)[1],
-                    'price' =>   explode(",", $t)[2],
+                    'price' =>   (float)explode(",", $t)[2],
                 ];
 			}
 		}
