@@ -11,18 +11,18 @@ class stocks extends Controller
 {
 	public function submitSelection(Request $request)
 	{
-		$invAmount = $request->input('principal') * ($request->input('investment_percent') / 100);
+		$invAmount = $request->input('principle') * ($request->input('investmentPercent') / 100);
 
 		$amountPerStock = $invAmount / 5;
 
-	    $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
+	    $startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
 
 	    $dateResults = DB::connection('ovs')->select("SELECT * FROM `ovscalendar` where calType = '2' and date_ BETWEEN ? and ? order by date_ asc", [$startDate, $endDate]);
 
 		try
 		{
-			$stockResults = \FSSCLE::VolitilityHVIVDifference($request->input('start_date'));
+			$stockResults = \FSSCLE::VolitilityHVIVDifference($request->input('startDate'));
 		}
 		catch(FSSNotFoundException $e)
 		{
@@ -33,7 +33,7 @@ class stocks extends Controller
             echo $e->getMessage();
         }
 
-		$date = $request->input('start_date');
+		$date = $request->input('startDate');
 
 		for($i = 0; $i < 5; $i++)
 		{
