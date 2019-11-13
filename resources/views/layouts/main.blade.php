@@ -20,6 +20,7 @@
 
 		<!-- Chart.js CDN -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+		<!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-crosshair@1.1.2"></script> -->
 
     </head>
     <body>
