@@ -7,6 +7,9 @@
 
         <title>Don Fishback</title>
 
+		<!-- Favicon -->
+		<link rel="shortcut icon" href="{{URL('/images/ODDS-online-icon.png')}}">
+
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
 
@@ -21,6 +24,9 @@
 		<!-- Chart.js CDN -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
 		<!-- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-crosshair@1.1.2"></script> -->
+
+		<!-- MomentJS CDN -->
+		<script src="https://cdn.jsdelivr.net/npm/moment@2.24.0/moment.min.js" type="text/javascript"></script>
 
     </head>
     <body>

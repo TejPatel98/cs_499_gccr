@@ -67,8 +67,26 @@
 						</div>
 
 						<div class="form-group col-sm">
-							{!! Form::label('investmentPercent', 'Investment Percent (%)') !!}
-							{!! Form::number('investmentPercent', '', ['class' => 'form-control', 'max' => '100,m']) !!}
+							{!! Form::label('investmentPercent', 'Allocation Amount (%)') !!}
+							{!! Form::number('investmentPercent', '', ['class' => 'form-control', 'max' => '100', 'min' => '1']) !!}
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="form-group col">
+							{!! Form::label('maxTradesPerDay', 'Maximum Number of Trades per Day') !!}
+							{!! Form::number('maxTradesPerDay', '', ['class' => 'form-control', 'max' => '15', 'min' => '1']) !!}
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="form-group col">
+							{!! Form::label('minTradeLength', 'Minimum Trading Length (Calendar Days)') !!}
+							{!! Form::number('minTradeLength', '', ['class' => 'form-control', 'min' => '14', 'max' => '38']) !!}
+						</div>
+						<div class="form-group col">
+							{!! Form::label('maxTradeLength', 'Maximum Trading Length (Calendar Days)') !!}
+							{!! Form::number('maxTradeLength', '', ['class' => 'form-control', 'min' => '14', 'max' => '38']) !!}
 						</div>
 					</div>
 
@@ -100,13 +118,19 @@
 		this.classList.remove("is-invalid");
 	}
 	
+	// Function to validate form on submit
 	var validate = function(event){
 		var err = "";
 		var alert = document.getElementById('errorMessage');
 		var principle = this.principle;
 		var investment = this.investmentPercent;
+		var maxTradesPerDay = this.maxTradesPerDay;
+		var minTradeLength = this.minTradeLength;
+		var maxTradeLength = this.maxTradeLength;
 		var start = this.startDate;
 		var end = this.endDate;
+
+		console.log(maxTradesPerDay.value + " " + minTradeLength.value + " " + maxTradeLength.value);
 
 		if (principle.value == ""){
 			err += "* Principle Amount required <br>";
@@ -114,9 +138,29 @@
 			principle.addEventListener("change", removeInvalidClass);
 		}
 		if (investment.value == ""){
-			err += "* Investment Percent required <br>";
+			err += "* Allocation Amount required <br>";
 			investment.classList.add('is-invalid');
 			investment.addEventListener("change", removeInvalidClass);
+		}
+		if (maxTradesPerDay.value == ""){
+			err += "* Maximum Number of Trades per Day required <br>";
+			maxTradesPerDay.classList.add('is-invalid');
+			maxTradesPerDay.addEventListener("change", removeInvalidClass);
+		}
+		if (minTradeLength.value == ""){
+			err += "* Minimum Trading Length required <br>";
+			minTradeLength.classList.add('is-invalid');
+			minTradeLength.addEventListener("change", removeInvalidClass);
+		}
+		if (maxTradeLength.value == ""){
+			err += "* Maximum Trading Length required <br>";
+			maxTradeLength.classList.add('is-invalid');
+			maxTradeLength.addEventListener("change", removeInvalidClass);
+		}
+		if (minTradeLength.value >= maxTradeLength.value){
+			err += "* Minimum Trading Length must be less than Maximum Trading Length <br>";
+			maxTradeLength.classList.add('is-invalid');
+			maxTradeLength.addEventListener("change", removeInvalidClass);
 		}
 		if (start.value >= end.value){	
 			err += "* Start date must be before end date <br>";

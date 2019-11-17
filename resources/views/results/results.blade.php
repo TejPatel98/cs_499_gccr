@@ -2,26 +2,46 @@
 
 @section('content')
 
-<div class="container" style="margin-top: 20px">
-    <h3 class="float-left" style="text-align: center">Portfolio Value: $106,236.84</h3>
-    <canvas id="chart-canvas" style="margin: 0 auto;"></canvas>
-    <h5 class="float-right" style="text-align: center;">Net Gain/Loss: $6,236.84</h5>
+<div class="container" style="margin-top: 20px">    
+    <h4 class="float-left" style="text-align: center">Portfolio Value: $106,236.84</h4>
+    <canvas id="chart-canvas" style="margin: 0 auto; padding: 10px"></canvas>
+    <h5 class="float-right">Net Gain/Loss: $6,236.84</h5>
+    <br>
+</div>
 
-    <table id="resultTable" class="table table-bordered invisible" style="margin-top: 60px;">
-        <thead class="thead-dark">
-            <tr>
-            <th scope="col">Symbol</th>
-            <th scope="col">Purchase Date</th>
-            <th scope="col">Number of Contracts</th>
-            <th scope="col">Price</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+<div class="container" style="margin-top: 40px">
+    <h5>
+        <span id="tableDate"></span>
+        <span id="tableCash" class="float-right"></span>
+    </h5>
+    <div class="table-responsive rounded">
+        <table id="resultTable" class="table invisible">
+            <thead class="thead-dark">
+                <tr>
+                <th scope="col">Symbol</th>
+                <th scope="col">Purchase Date</th>
+                <th scope="col">Expire Date</th>
+                <th scope="col">Strike</th>
+                <th scope="col">Purchase Price</th>
+                <th scope="col">Number of Contracts</th>
+                <th scope="col">Current Price</th>
+                <th scope="col">Current Value</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
+    function generateChartData(){
+        data = []
+        for(let i = 0; i < 30; i++)
+            data.push(Math.floor(Math.random() * (400 - 15 + 1) ) + 15);
+        return data;
+    }
+
     var ctx = document.getElementById('chart-canvas').getContext('2d');
     var chartOptions = {
             responsive: true, 
@@ -30,20 +50,25 @@
             scales: {
                 xAxes: [{
                     type: 'time',
-                    distribution: 'series',
+                    distribution: 'linear',
                     display: true,
                     scaleLabel: {
                         display: true,
+                        fontSize: 18,
                         labelString: "Date",
-                    }
+                    },
+                    time: {
+                        tooltipFormat: 'll'
+                    },
                 }],
                 yAxes: [{
-                    ticks: {
-                        beginAtZero: true,
-                    },
+                    // ticks: {
+                    //     beginAtZero: true,
+                    // },
                     display: true,
                     scaleLabel: {
                         display: true,
+                        fontSize: 18,
                         labelString: "Value ($)",
                     }
                 }],
@@ -55,7 +80,7 @@
             datasets: [{
                 fill: false,
                 label: '',
-                data: [67, 5, 123, 8, 33, 21, 176, 160, 3, 150, 170, 195, 184, 107, 63, 80, 93, 130, 88, 61, 84, 196, 159, 124, 122, 136, 40, 18, 59, 91],
+                data: generateChartData(),
                 borderColor: '#1fce97',
                 backgroundColor: '#1fce97',
                 pointBorderColor: '#1c926d',
@@ -86,6 +111,12 @@
         // AJAX request to get data
         //*********************** 
 
+        // Put date and cash balance at top of table
+        var date = chartData.labels[point];
+        date = moment(new Date(date)).format('MMMM Do, YYYY');
+        document.getElementById('tableDate').innerHTML = date;
+        document.getElementById('tableCash').innerHTML = 'Cash Balance: $' + (Math.floor(Math.random() * (120000 - 90000 + 1) ) + 90000);
+
         var tbl = document.getElementById('resultTable');
         var tblBody = tbl.children[1];
 
@@ -103,18 +134,23 @@
             data.push({});
             for (let j = 0; j < 4; j++){
                 data[i].symbol = i;
-                data[i].datePurchased = Date.now();
-                data[i].numOwned = Math.floor(Math.random() * (14 - 4 + 1) ) + 4;
-                data[i].contractPrice = "$" +( Math.floor(Math.random() * (400 - 15 + 1) ) + 15);
+                data[i].purchaseDate = moment(new Date()).format('MM/DD/YYYY');
+                data[i].expireDate = moment(new Date()).format('MM/DD/YYYY');
+                data[i].strike = "$" +(Math.floor(Math.random() * (400 - 15 + 1) ) + 15);
+                data[i].purchasePrice = "$" +(Math.floor(Math.random() * (400 - 15 + 1) ) + 15);
+                data[i].numContractsOwned = Math.floor(Math.random() * (14 - 4 + 1) ) + 4;
+                data[i].currentPrice = "$" +(Math.floor(Math.random() * (400 - 15 + 1) ) + 15);
+                data[i].currentValue = "$" +(Math.floor(Math.random() * (120000 - 90000 + 1) ) + 90000);
+
             }
         }// **************************************************************************************
         
 
-        // Dynamically add data to the table
+        // Add data to the table
         for(let i = 0; i < numOptions; i++){
             var row =  document.createElement('tr');
             var values = Object.values(data[i]);
-            for(let j = 0; j < 4; j++){
+            for(let j = 0; j < 8 ; j++){
                 var td = document.createElement('td');
                 td.innerHTML = values[j];
                 row.appendChild(td);
