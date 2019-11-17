@@ -58,6 +58,7 @@ class stocks extends Controller
 					oc.eqId,
 					DATEDIFF(oc.expDate, :date1) AS daysToExp, 
 					DATEDIFF(oc.expDate, oc.startDate) AS optLength,
+					oc.optId,
 					oc.expDate,
 					op.date_,
 					oc.putCall,
@@ -86,6 +87,25 @@ class stocks extends Controller
 			$counter++;
 		}
 
-		dd($callResults);
+		foreach($callResults as $callResult)
+		{
+			$arguments = [
+				'optId' => $callResult[0]->optId,
+				'startDate' => $startDate,
+				'endDate' => $endDate,
+			];
+
+			$query = "
+				SELECT *
+				FROM `optprice`
+				WHERE optId=:optId and date_ BETWEEN :startDate and :endDate
+			";
+
+			$result = DB::connection('ovs')->select($query, $arguments);
+
+			$priceHistory[$callResult[0]->optId] = $result;
+		}
+
+		dd($priceHistory);
 	}
 }
