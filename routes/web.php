@@ -17,4 +17,6 @@ Route::get('/', function () {
 
 Route::view('/stock', 'stocks/select')->name('stock.select');
 
+Route::view('/results', 'results/results')->name('stock.results');
+
 Route::post('/stock/submit', 'stocks@submitSelection')->name('stock.submit');
