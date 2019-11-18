@@ -20,6 +20,12 @@ class stocks extends Controller
 		// Get the valid trading days
 	    $dateResults = DB::connection('ovs')->select("SELECT * FROM `ovscalendar` where calType = '2' and date_ BETWEEN ? and ? order by date_ asc", [$startDate, $endDate]);
 
+		// Format all the date results to YYYY-MM-DD ex 2000-01-01
+		foreach($dateResults as $result)
+		{
+			$formattedDates[] = (new \DateTime($result->date_))->format('Y-m-d');
+		}
+
 		// Get the scan results for the first day
 		$stockResults = \FSSCLE::VolitilityHVIVDifference($request->input('startDate'));
 
@@ -29,7 +35,7 @@ class stocks extends Controller
 		// Choose the options near the strike price
 		$chosenOptions = $this->optionSelect($optionList);
 
-		// The the history of the chosen options
+		// Get the history of the chosen options
 		$priceHistory = $this->getPriceHistory($chosenOptions, $startDate, $endDate);
 
 		dd($priceHistory);
