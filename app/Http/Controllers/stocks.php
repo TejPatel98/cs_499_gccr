@@ -46,42 +46,49 @@ class stocks extends Controller
         $theChosenOnes = array();
         $max_option_hold_days = 50;
 
-        for ($i =0; $i < 5; $i++){
-            $theChosenOne;
-            $closest_to_max_option_hold_days = False;
-            $correctOptionFound = False;
-            $optionBuyPrice = -1.00;
-            $finalOptionBuyPrice = -1;
-            $daysToExpire = -1;
-            $counter = 0;
-            for ($counter = 0; $counter < count($list[$i]); $counter++){
-                //echo $counter." ";    
-                if ($counter == 0){
-                    
-                    $theChosenOne = $list[$i][$counter];
-                    $optionBuyPrice = floatval($list[$i][$counter]->optAsk)*100;
-                    //dd(substr(explode("+\"strike\": \"", $list[$i][$counter])[1], 0, 5));
-                }
-                else{
-                    //echo intval($list[$i][$counter]-> daysToExp)." ";
-                    if (intval($list[$i][$counter]-> daysToExp) < $max_option_hold_days){
-                        if ((floatval($list[$i][$counter]->optAsk)*100) <= $optionBuyPrice){
-                                $theChosenOne = $list[$i][$counter]; 
-                            }
-                            else{
-                                break;
-                            }
+		for ($i =0; $i < 5; $i++)
+		{
+			$theChosenOne;
+			$closest_to_max_option_hold_days = False;
+			$correctOptionFound = False;
+			$optionBuyPrice = -1.00;
+			$finalOptionBuyPrice = -1;
+			$daysToExpire = -1;
+			$counter = 0;
+			for ($counter = 0; $counter < count($list[$i]); $counter++)
+			{
+				//echo $counter." ";    
+				if ($counter == 0)
+				{
 
-                    }
-                }   
+					$theChosenOne = $list[$i][$counter];
+					$optionBuyPrice = floatval($list[$i][$counter]->optAsk)*100;
+					//dd(substr(explode("+\"strike\": \"", $list[$i][$counter])[1], 0, 5));
+				}
+				else
+				{
+					//echo intval($list[$i][$counter]-> daysToExp)." ";
+					if (intval($list[$i][$counter]-> daysToExp) < $max_option_hold_days)
+					{
+						if ((floatval($list[$i][$counter]->optAsk)*100) <= $optionBuyPrice)
+						{
+							$theChosenOne = $list[$i][$counter]; 
+						}
+						else
+						{
+							break;
+						}
 
-                $counter += 1;
+					}
+				}   
 
-            }
+				$counter += 1;
 
-            array_push($theChosenOnes, $theChosenOne);
+			}
 
-        } 
+			array_push($theChosenOnes, $theChosenOne);
+
+		} 
 
         return $theChosenOnes;
     }
