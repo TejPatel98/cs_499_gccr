@@ -7,16 +7,18 @@ use App\Exceptions\InvalidDateFormat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+
+
 class stocks extends Controller
 {
 	public function submitSelection(Request $request)
 	{
 		// Setup variables
 		$invAmount = $request->input('principle') * ($request->input('investmentPercent') * 0.01);
-		$amountPerStock = $invAmount * 0.2;
-	    $startDate = $request->input('startDate');
-        $endDate = $request->input('endDate');
 		$maxTrades = $request->input('maxTradesPerDay');
+		$amountPerStock = $invAmount * pow($maxTrades, -1);
+		$startDate = $request->input('startDate');
+        $endDate = $request->input('endDate');
 		$maxTradeLength = $request->input('maxTradeLength');
 		$minTradeLength = $request->input('minTradeLength');		
 
@@ -32,47 +34,94 @@ class stocks extends Controller
 		{
 			$formattedDates[] = (new \DateTime($result->date_))->format('Y-m-d');
 		}
-		
-
-/*		// Get the scan results for the first day
-		$stockResults = \FSSCLE::VolitilityHVIVDifference($request->input('startDate'));
-
-		// Get the options list for the first day
-		$optionList = $this->getOptionsList($stockResults, $startDate, $amountPerStock, $maxTrades);
-
-		// Choose the options near the strike price
-		$chosenOptions = $this->optionSelect($optionList, $maxTradeLength, $minTradeLength);
-
-		// Get the history of the chosen options
-		$priceHistory = $this->getPriceHistory($chosenOptions, $startDate, $endDate);
-*/		
-		$foo = array();
+		$balance = $request->input('principle');
+		$data = array();
 		foreach($formattedDates as $date)
 		{
+
+			$values = array(
+				'balance' => intval($balance),
+				'invAmount' => $balance * ($request->input('investmentPercent') * 0.01),
+				'amountForEachStock' => $balance * ($request->input('investmentPercent') * 0.01) * pow($maxTrades, -1),
+				'information' => array()
+				// $this->fillOptionData($date, $amountPerStock, $maxTrades, $maxTradeLength, $minTradeLength, $balance, $startDate, $endDate)
+			);
+
+			$amountSpentOnThisDay = 0;
 
 			// Get the scan results for the first day
 			$stockResults = \FSSCLE::VolitilityHVIVDifference($date);
 
 			// Get the options list for the first day
 			$optionList = $this->getOptionsList($stockResults, $date, $amountPerStock, $maxTrades);
-
+			
 			// Choose the options near the strike price
-			$chosenOptions = $this->optionSelect($optionList, $maxTradeLength, $minTradeLength);
+			$chosenOptions = $this->optionSelect($optionList, $maxTradeLength, $minTradeLength, $balance);
+			
+			// Adds values for each day
+			for ($i = 0; $i < count($chosenOptions); $i++)
+			{
+				$balance -= intval($chosenOptions[$i]->optAsk*100 * floor($amountPerStock * pow($chosenOptions[$i]->optAsk*100, -1)));
+				$newOption = array(
+					'optionId' => $chosenOptions[$i]->optId,
+					'purchaseDate' => $date,
+					'expDate' => $chosenOptions[$i]->expDate,
+					'pricePerOption' => $chosenOptions[$i]->optAsk*100,
+					'numberOfOptions' => floor($amountPerStock * pow($chosenOptions[$i]->optAsk*100, -1)),
+					'amountSpent' => $chosenOptions[$i]->optAsk*100 * floor($amountPerStock * pow($chosenOptions[$i]->optAsk*100, -1)),
+					'priceHistory' => $this->getPriceHistory($chosenOptions[$i], $date, $endDate)[$chosenOptions[$i]->optId]
+				);
+				$values['information'][] = $newOption;
+			}
 
-			// Get the history of the chosen options
-			$priceHistory = $this->getPriceHistory($chosenOptions, $date, $endDate);
+			// $amountSpentOnThisDay = 0;
+			// foreach($values['information'] as $val)
+			// {
+			// 	echo $val;
+			// }
+			// $balance -= $amountSpentOnThisDay;
 
-			$foo[] = $priceHistory;	
+			$data[$date] = $values;
 		}	
 
-		dd($foo);
+		dd($data);
 	}
 
-    private function optionSelect($list, $maxLength, $minLength)
+	private function fillOptionData($date, $amountPerStock, $maxTrades, $maxTradeLength, $minTradeLength, $balance, $startDate, $endDate)
+	{
+		$foo = array();
+		$stockResults = \FSSCLE::VolitilityHVIVDifference($date);
+
+		// Get the options list for the first day
+		$optionList = $this->getOptionsList($stockResults, $date, $amountPerStock, $maxTrades);
+		
+		// Choose the options near the strike price
+		$chosenOptions = $this->optionSelect($optionList, $maxTradeLength, $minTradeLength, $balance);
+		
+		// Adds values for each day
+		for ($i = 0; $i < count($chosenOptions); $i++)
+		{
+			$newOption = array(
+				'optionId' => $chosenOptions[$i]->optId,
+				'purchaseDate' => $date,
+				'expDate' => $chosenOptions[$i]->expDate,
+				'pricePerOption' => $chosenOptions[$i]->optAsk*100,
+				'numberOfOptions' => floor($amountPerStock * pow($chosenOptions[$i]->optAsk*100, -1)),
+				'amountSpent' => $chosenOptions[$i]->optAsk*100 * floor($amountPerStock * pow($chosenOptions[$i]->optAsk*100, -1)),
+				'priceHistory' => $this->getPriceHistory($chosenOptions[$i], $date, $endDate)[$chosenOptions[$i]->optId]
+			);
+			$foo[] = $newOption;
+		}
+
+		return $foo;
+	}
+
+    private function optionSelect($list, $maxLength, $minLength, $invAmt)
     {
         $theChosenOnes = array();
         $max_option_hold_days = 50;
-
+		$amountPerStock = $invAmt * 0.2;
+		
         for ($i =0; $i < count($list); $i++){
             $theChosenOne;
             $closest_to_max_option_hold_days = False;
@@ -101,8 +150,8 @@ class stocks extends Controller
 *
 */
 
-                    if (intval($list[$i][$counter]-> daysToExp) <= $maxLength and intval($list[$i][$counter]-> daysToExp) >= 10){
-                        if ((floatval($list[$i][$counter]->optAsk)*100) <= $optionBuyPrice){
+                    if (intval($list[$i][$counter]-> daysToExp) <= $maxLength and intval($list[$i][$counter]-> daysToExp) >= $minLength){
+                        if ((floatval($list[$i][$counter]->optAsk)*100) <= $amountPerStock){
                                 $theChosenOne = $list[$i][$counter]; 
                             }
                             else{
@@ -125,10 +174,10 @@ class stocks extends Controller
 
 	// This takes in a list of options and gets the price history
 	// from a start date to an end date.
-	private function getPriceHistory($chosenOptions, $startDate, $endDate)
+	private function getPriceHistory($option, $startDate, $endDate)
 	{
-		foreach($chosenOptions as $option)
-		{
+		// foreach($chosenOptions as $option)
+		// {
 			$arguments = [
 				'optId' => $option->optId,
 				'startDate' => $startDate,
@@ -144,7 +193,7 @@ class stocks extends Controller
 			$result = DB::connection('ovs')->select($query, $arguments);
 
 			$priceHistory[$option->optId] = $result;
-		}
+		// }
 		
 
 		return $priceHistory;
@@ -206,4 +255,24 @@ class stocks extends Controller
 
 		return $callResults;
 	}
+
+	// private function updatedInvAmount($optionData, $investment)
+	// {
+	// 	foreach($optionData as $opt)
+	// 	{
+	// 		$investment -= $opt->optAsk*100
+	// 	}
+	// }
 }
+
+// class optionDetails {
+// 	public $name;
+// 	public $optionId;
+// 	public $purchaseDate;
+// 	public $expDate;
+// 	public $symbol;
+// 	public $pricePerOption;
+// 	public $numberOfOptions;
+// 	public $amountSpent;
+// 	public $priceHistory;
+// }
