@@ -54,13 +54,13 @@ class stocks extends Controller
 			$stockResults = \FSSCLE::VolitilityHVIVDifference($date);
 
 			// Get the options list for the first day
-			$optionList = $this->getOptionsList($stockResults, $startDate, $amountPerStock, $maxTrades);
+			$optionList = $this->getOptionsList($stockResults, $date, $amountPerStock, $maxTrades);
 
 			// Choose the options near the strike price
 			$chosenOptions = $this->optionSelect($optionList, $maxTradeLength, $minTradeLength);
 
 			// Get the history of the chosen options
-			$priceHistory = $this->getPriceHistory($chosenOptions, $startDate, $endDate);
+			$priceHistory = $this->getPriceHistory($chosenOptions, $date, $endDate);
 
 			$foo[] = $priceHistory;	
 		}	
@@ -145,6 +145,7 @@ class stocks extends Controller
 
 			$priceHistory[$option->optId] = $result;
 		}
+		
 
 		return $priceHistory;
 	}
