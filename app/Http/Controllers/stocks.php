@@ -87,35 +87,6 @@ class stocks extends Controller
 		dd($data);
 	}
 
-	private function fillOptionData($date, $amountPerStock, $maxTrades, $maxTradeLength, $minTradeLength, $balance, $startDate, $endDate)
-	{
-		$foo = array();
-		$stockResults = \FSSCLE::VolitilityHVIVDifference($date);
-
-		// Get the options list for the first day
-		$optionList = $this->getOptionsList($stockResults, $date, $amountPerStock, $maxTrades);
-		
-		// Choose the options near the strike price
-		$chosenOptions = $this->optionSelect($optionList, $maxTradeLength, $minTradeLength, $balance);
-		
-		// Adds values for each day
-		for ($i = 0; $i < count($chosenOptions); $i++)
-		{
-			$newOption = array(
-				'optionId' => $chosenOptions[$i]->optId,
-				'purchaseDate' => $date,
-				'expDate' => $chosenOptions[$i]->expDate,
-				'pricePerOption' => $chosenOptions[$i]->optAsk*100,
-				'numberOfOptions' => floor($amountPerStock * pow($chosenOptions[$i]->optAsk*100, -1)),
-				'amountSpent' => $chosenOptions[$i]->optAsk*100 * floor($amountPerStock * pow($chosenOptions[$i]->optAsk*100, -1)),
-				'priceHistory' => $this->getPriceHistory($chosenOptions[$i], $date, $endDate)[$chosenOptions[$i]->optId]
-			);
-			$foo[] = $newOption;
-		}
-
-		return $foo;
-	}
-
     private function optionSelect($list, $maxLength, $minLength, $invAmt)
     {
         $theChosenOnes = array();
