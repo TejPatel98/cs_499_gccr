@@ -35,6 +35,9 @@
 </div>
 
 <script>
+
+	var results = @json($results);
+
     function generateChartData(){
         data = []
         for(let i = 0; i < 30; i++)

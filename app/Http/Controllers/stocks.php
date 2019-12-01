@@ -84,7 +84,11 @@ class stocks extends Controller
 			$data[$date] = $values;
 		}	
 
-		dd($data);
+		$viewData = [
+			'results' => $data,
+		];
+
+        return view('results/results', $viewData);
 	}
 
     private function optionSelect($list, $maxLength, $minLength, $invAmt)
