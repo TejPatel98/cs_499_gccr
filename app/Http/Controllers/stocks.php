@@ -12,41 +12,68 @@ class stocks extends Controller
 	public function submitSelection(Request $request)
 	{
 		// Setup variables
-		$invAmount = $request->input('principle') * ($request->input('investmentPercent') / 100);
-		$amountPerStock = $invAmount / 5;
+		$invAmount = $request->input('principle') * ($request->input('investmentPercent') * 0.01);
+		$amountPerStock = $invAmount * 0.2;
 	    $startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
+		$maxTrades = $request->input('maxTradesPerDay');
+		$maxTradeLength = $request->input('maxTradeLength');
+		$minTradeLength = $request->input('minTradeLength');		
 
-		// Get the valid trading days
-	    $dateResults = DB::connection('ovs')->select("SELECT * FROM `ovscalendar` where calType = '2' and date_ BETWEEN ? and ? order by date_ asc", [$startDate, $endDate]);
+		/*
+		echo "max: ".$maxTradeLength;
+		echo "min: ".$minTradeLength;
+		*/// Get the valid trading days
+
+		$dateResults = DB::connection('ovs')->select("SELECT * FROM `ovscalendar` where calType = '2' and date_ BETWEEN ? and ? order by date_ asc", [$startDate, $endDate]);
 
 		// Format all the date results to YYYY-MM-DD ex 2000-01-01
 		foreach($dateResults as $result)
 		{
 			$formattedDates[] = (new \DateTime($result->date_))->format('Y-m-d');
 		}
+		
 
-		// Get the scan results for the first day
+/*		// Get the scan results for the first day
 		$stockResults = \FSSCLE::VolitilityHVIVDifference($request->input('startDate'));
 
 		// Get the options list for the first day
-		$optionList = $this->getOptionsList($stockResults, $startDate, $amountPerStock);
+		$optionList = $this->getOptionsList($stockResults, $startDate, $amountPerStock, $maxTrades);
 
 		// Choose the options near the strike price
-		$chosenOptions = $this->optionSelect($optionList);
+		$chosenOptions = $this->optionSelect($optionList, $maxTradeLength, $minTradeLength);
 
 		// Get the history of the chosen options
 		$priceHistory = $this->getPriceHistory($chosenOptions, $startDate, $endDate);
+*/		
+		$foo = array();
+		foreach($formattedDates as $date)
+		{
 
-		dd($priceHistory);
+			// Get the scan results for the first day
+			$stockResults = \FSSCLE::VolitilityHVIVDifference($date);
+
+			// Get the options list for the first day
+			$optionList = $this->getOptionsList($stockResults, $startDate, $amountPerStock, $maxTrades);
+
+			// Choose the options near the strike price
+			$chosenOptions = $this->optionSelect($optionList, $maxTradeLength, $minTradeLength);
+
+			// Get the history of the chosen options
+			$priceHistory = $this->getPriceHistory($chosenOptions, $startDate, $endDate);
+
+			$foo[] = $priceHistory;	
+		}	
+
+		dd($foo);
 	}
 
-    private function optionSelect($list)
+    private function optionSelect($list, $maxLength, $minLength)
     {
         $theChosenOnes = array();
         $max_option_hold_days = 50;
 
-        for ($i =0; $i < 5; $i++){
+        for ($i =0; $i < count($list); $i++){
             $theChosenOne;
             $closest_to_max_option_hold_days = False;
             $correctOptionFound = False;
@@ -58,13 +85,23 @@ class stocks extends Controller
                 //echo $counter." ";    
                 if ($counter == 0){
                     
+        //            echo intval($list[$i][$counter]-> daysToExp)." ";
                     $theChosenOne = $list[$i][$counter];
                     $optionBuyPrice = floatval($list[$i][$counter]->optAsk)*100;
                     //dd(substr(explode("+\"strike\": \"", $list[$i][$counter])[1], 0, 5));
                 }
                 else{
-                    //echo intval($list[$i][$counter]-> daysToExp)." ";
-                    if (intval($list[$i][$counter]-> daysToExp) < $max_option_hold_days){
+
+//                    echo intval($list[$i][$counter]-> daysToExp)." ";
+
+
+/*
+*
+* Ask Don if we want to remove the min length and also work with only a mxaimum than having both
+*
+*/
+
+                    if (intval($list[$i][$counter]-> daysToExp) <= $maxLength and intval($list[$i][$counter]-> daysToExp) >= 10){
                         if ((floatval($list[$i][$counter]->optAsk)*100) <= $optionBuyPrice){
                                 $theChosenOne = $list[$i][$counter]; 
                             }
@@ -112,12 +149,12 @@ class stocks extends Controller
 		return $priceHistory;
 	}
 
-	private function getOptionsList($stocks, $date, $amountPerStock)
+	private function getOptionsList($stocks, $date, $amountPerStock, $maxTrade)
 	{
 		$optionsFound = 0;
 		$counter = 0;
 
-		while($optionsFound < 5 && $counter < count($stocks)) 
+		while($optionsFound < $maxTrade && $counter < count($stocks)) 
 		{
 			// You cannot use named bindings multiple times in the same query.
 			// There must be an individual named binding for each spot.
