@@ -69,7 +69,7 @@ class stocks extends Controller
 						'name' => $key,
 						'optionId' => $value->optId,
 						'purchaseDate' => $date,
-						'expDate' => $value->expDate,
+						'expDate' => (new \DateTime($value->expDate))->format('Y-m-d'),
 						'pricePerOption' => $value->optAsk*100,
 						'numberOfOptions' => floor($amountPerStock * pow($value->optAsk*100, -1)),
 						'amountSpent' => $value->optAsk*100 * floor($amountPerStock * pow($value->optAsk*100, -1)),
@@ -87,24 +87,69 @@ class stocks extends Controller
 
 				// Else you just skip the day and move forward
 		}	
-		// dd($data);
 
-		$viewData = [
-			'results' => $data,
-		];
+		$portfolioValue = $this->getPortfolioValue($data);
 
-        return view('results/results', $viewData);
+		foreach($formattedDates as $date)
+		{
+			$valForToday = $this->getSpecificDayValue($portfolioValue, $date);
+			$data[$date]["portfolioValue"] = $valForToday;
+		}
+
+		dd($data);
+
+		// $viewData = [
+		// 	'results' => $data,
+		// ];
+
+        // return view('results/results', $viewData);
 	}
 
-    private function optionSelect($list, $maxLength, $minLength, $amtForEachStock)
-    {
 
 /*
 *
 * Ask Don if we want to remove the min length and also work with only a mxaimum than having both
 * We either need to remove the minimum trade length or the maximum trade length
+* portfolio price based on Ask or Bid 
+* need to add the sell functionality and hten compute portoflio value 
 *
 */
+
+	private function getPortfolioValue ($data)
+	{
+		$chosenOptionsThroughout = array();
+		foreach($data as $key=> $value)
+		{
+			foreach($value['information'] as $temp)
+			{
+				$chosenOptionsThroughout[] = $temp;
+			}
+		}
+		return $chosenOptionsThroughout;
+	}
+
+	private function getSpecificDayValue($portfolioVal, $date)
+	{
+		$portfolioValueForToday = 0;
+		foreach ($portfolioVal as $optionVals)
+		{
+			if($optionVals['expDate'] > $date)
+				foreach($optionVals['priceHistory'] as $priceHistoryVar)
+				{
+					$optPriceHistoryDate = (new \DateTime($priceHistoryVar->date_))->format('Y-m-d');
+					if ($optPriceHistoryDate == $date)
+						$portfolioValueForToday += floatval($priceHistoryVar->ask*100*$optionVals['numberOfOptions']);
+				}
+
+		}
+		return $portfolioValueForToday;
+	}
+
+
+
+    private function optionSelect($list, $maxLength, $minLength, $amtForEachStock)
+    {
+
         $theChosenOnes = array();
 		
 		foreach($list as $key=> $val)
@@ -238,14 +283,3 @@ class stocks extends Controller
 	// }
 }
 
-// class optionDetails {
-// 	public $name;
-// 	public $optionId;
-// 	public $purchaseDate;
-// 	public $expDate;
-// 	public $symbol;
-// 	public $pricePerOption;
-// 	public $numberOfOptions;
-// 	public $amountSpent;
-// 	public $priceHistory;
-// }
