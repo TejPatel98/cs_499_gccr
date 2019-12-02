@@ -138,7 +138,7 @@ class stocks extends Controller
 				{
 					$optPriceHistoryDate = (new \DateTime($priceHistoryVar->date_))->format('Y-m-d');
 					if ($optPriceHistoryDate == $date)
-						$portfolioValueForToday += floatval($priceHistoryVar->ask*100*$optionVals['numberOfOptions']);
+						$portfolioValueForToday += floatval($priceHistoryVar->bid*100*$optionVals['numberOfOptions']);
 				}
 
 		}
