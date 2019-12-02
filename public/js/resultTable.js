@@ -18,7 +18,7 @@ function generateTable(point){
 
     // Put date and cash balance at top of table
     var date = chartData.labels[point];
-    date = moment(new Date(date)).format('MMMM Do, YYYY');
+    date = moment.utc(new Date(date)).format('MMMM Do, YYYY');
     document.getElementById('tableDate').innerHTML = date;
     document.getElementById('tableCash').innerHTML = 'Cash Balance: $' + (Math.floor(Math.random() * (120000 - 90000 + 1) ) + 90000);
 
@@ -31,28 +31,26 @@ function generateTable(point){
     tblBody = tbl.children[1];
 
     
-    // Generate random data*******************************************************************
-    // Will be replaced with actual data from AJAX request from above
-    var numOptions = Math.floor(Math.random() * (20 - 6 + 1) ) + 6;
+    // Insert needed data from results into a 'data' object
+    var currentDay = Object.keys(results)[point];
     var data = [];
-    for(let i = 0; i < numOptions; i++){
+    for(let i = 0; i < results[currentDay].information.length; i++){
         data.push({});
-        for (let j = 0; j < 4; j++){
-            data[i].symbol = i;
-            data[i].purchaseDate = moment(new Date()).format('MM/DD/YYYY');
-            data[i].expireDate = moment(new Date()).format('MM/DD/YYYY');
-            data[i].strike = "$" +(Math.floor(Math.random() * (400 - 15 + 1) ) + 15);
-            data[i].purchasePrice = "$" +(Math.floor(Math.random() * (400 - 15 + 1) ) + 15);
-            data[i].numContractsOwned = Math.floor(Math.random() * (14 - 4 + 1) ) + 4;
-            data[i].currentPrice = "$" +(Math.floor(Math.random() * (400 - 15 + 1) ) + 15);
-            data[i].currentValue = "$" +(Math.floor(Math.random() * (120000 - 90000 + 1) ) + 90000);
+        data[i].symbol = results[currentDay].information[i].optionId;
+        data[i].purchaseDate = moment.utc(new Date(results[currentDay].information[i].purchaseDate)).format('MM/DD/YYYY');
+        data[i].expireDate = moment.utc(new Date(results[currentDay].information[i].expDate)).format('MM/DD/YYYY');
+        data[i].strike = "$" +(parseFloat(results[currentDay].information[i].strike).toFixed(2));
+        data[i].purchasePrice = "$" +(results[currentDay].information[i].amountSpent.toFixed(2));
+        data[i].numContractsOwned = results[currentDay].information[i].numberOfOptions;
+        data[i].currentPrice = "$" +(results[currentDay].information[i].priceHistory[0].close_);
+        data[i].currentValue = "$" +((data[i].numContractsOwned * results[currentDay].information[i].priceHistory[0].close_).toFixed(2));
 
-        }
+
     }// **************************************************************************************
-    
+    console.log(data);
 
     // Add data to the table
-    for(let i = 0; i < numOptions; i++){
+    for(let i = 0; i < results[currentDay].information.length; i++){
         var row =  document.createElement('tr');
         var values = Object.values(data[i]);
         for(let j = 0; j < 8 ; j++){

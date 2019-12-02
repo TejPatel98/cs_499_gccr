@@ -34,6 +34,7 @@
     </div>
 </div>
 
+<script> var results = @json($results);  console.log(results); </script>
 <script src="{{URL('/js/chartSetup.js')}}"></script>
 <script src="{{URL('/js/resultTable.js')}}"></script>
 
