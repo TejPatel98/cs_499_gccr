@@ -16,7 +16,7 @@ class stocks extends Controller
 		// Setup variables
 		$invAmount = $request->input('principle') * ($request->input('investmentPercent') * 0.01);
 		$maxTrades = $request->input('maxTradesPerDay');
-		$amountPerStock = $invAmount * pow($maxTrades, -1);
+		//$amountPerStock = $invAmount * pow($maxTrades, -1);
 		$startDate = $request->input('startDate');
         $endDate = $request->input('endDate');
 		$maxTradeLength = $request->input('maxTradeLength');
@@ -34,55 +34,60 @@ class stocks extends Controller
 		{
 			$formattedDates[] = (new \DateTime($result->date_))->format('Y-m-d');
 		}
+
 		$balance = $request->input('principle');
 		$data = array();
 		foreach($formattedDates as $date)
 		{
-
-			$values = array(
-				'balance' => intval($balance),
-				'invAmount' => $balance * ($request->input('investmentPercent') * 0.01),
-				'amountForEachStock' => $balance * ($request->input('investmentPercent') * 0.01) * pow($maxTrades, -1),
-				'information' => array()
-				// $this->fillOptionData($date, $amountPerStock, $maxTrades, $maxTradeLength, $minTradeLength, $balance, $startDate, $endDate)
-			);
-
-			$amountSpentOnThisDay = 0;
-
-			// Get the scan results for the first day
-			$stockResults = \FSSCLE::VolitilityHVIVDifference($date);
-
-			// Get the options list for the first day
-			$optionList = $this->getOptionsList($stockResults, $date, $amountPerStock, $maxTrades);
-			
-			// Choose the options near the strike price
-			$chosenOptions = $this->optionSelect($optionList, $maxTradeLength, $minTradeLength, $balance);
-			
-			// Adds values for each day
-			for ($i = 0; $i < count($chosenOptions); $i++)
-			{
-				$balance -= intval($chosenOptions[$i]->optAsk*100 * floor($amountPerStock * pow($chosenOptions[$i]->optAsk*100, -1)));
-				$newOption = array(
-					'optionId' => $chosenOptions[$i]->optId,
-					'purchaseDate' => $date,
-					'expDate' => $chosenOptions[$i]->expDate,
-					'pricePerOption' => $chosenOptions[$i]->optAsk*100,
-					'numberOfOptions' => floor($amountPerStock * pow($chosenOptions[$i]->optAsk*100, -1)),
-					'amountSpent' => $chosenOptions[$i]->optAsk*100 * floor($amountPerStock * pow($chosenOptions[$i]->optAsk*100, -1)),
-					'priceHistory' => $this->getPriceHistory($chosenOptions[$i], $date, $endDate)[$chosenOptions[$i]->optId]
-				);
-				$values['information'][] = $newOption;
-			}
-
-			// $amountSpentOnThisDay = 0;
-			// foreach($values['information'] as $val)
+				$amountPerStock = $balance * ($request->input('investmentPercent') * 0.01) * pow($maxTrades, -1);
+			// if ($balance > 30)
 			// {
-			// 	echo $val;
-			// }
-			// $balance -= $amountSpentOnThisDay;
+	
+				$amountSpentOnThisDay = 0;
+	
+				// Get the scan results for the first day
+				$stockResults = \FSSCLE::VolitilityHVIVDifference($date);
+	
+				// Get the options list for the first day
+				$optionList = $this->getOptionsList($stockResults, $date, $amountPerStock, $maxTrades);
+				
+				// Choose the options near the strike price
+				$chosenOptions = $this->optionSelect($optionList, $maxTradeLength, $minTradeLength, $amountPerStock);
 
-			$data[$date] = $values;
+				$values = array(
+					'balance' => intval($balance),
+					'invAmount' => $balance * ($request->input('investmentPercent') * 0.01),
+					'amountForEachStock' => $amountPerStock,
+					'information' => array()
+					// $this->fillOptionData($date, $amountPerStock, $maxTrades, $maxTradeLength, $minTradeLength, $balance, $startDate, $endDate)
+				);
+
+				foreach($chosenOptions as $key=> $value)
+				{
+					$balance -= intval($value->optAsk*100 * floor($amountPerStock * pow($value->optAsk*100, -1)));
+					$newOption = array(
+						'name' => $key,
+						'optionId' => $value->optId,
+						'purchaseDate' => $date,
+						'expDate' => $value->expDate,
+						'pricePerOption' => $value->optAsk*100,
+						'numberOfOptions' => floor($amountPerStock * pow($value->optAsk*100, -1)),
+						'amountSpent' => $value->optAsk*100 * floor($amountPerStock * pow($value->optAsk*100, -1)),
+						'priceHistory' => $this->getPriceHistory($value, $date, $endDate)[$value->optId]
+					);
+					$values['information'][] = $newOption;
+				}
+	
+	
+				$amountSpentOnThisDay = 0;
+				$balance -= $amountSpentOnThisDay;
+	
+				$data[$date] = $values;
+			// }
+
+				// Else you just skip the day and move forward
 		}	
+		// dd($data);
 
 		$viewData = [
 			'results' => $data,
@@ -91,60 +96,53 @@ class stocks extends Controller
         return view('results/results', $viewData);
 	}
 
-    private function optionSelect($list, $maxLength, $minLength, $invAmt)
+    private function optionSelect($list, $maxLength, $minLength, $amtForEachStock)
     {
+
+/*
+*
+* Ask Don if we want to remove the min length and also work with only a mxaimum than having both
+* We either need to remove the minimum trade length or the maximum trade length
+*
+*/
         $theChosenOnes = array();
-        $max_option_hold_days = 50;
-		$amountPerStock = $invAmt * 0.2;
 		
-        for ($i =0; $i < count($list); $i++){
-            $theChosenOne;
+		foreach($list as $key=> $val)
+		{
+			$theChosenOne;
             $closest_to_max_option_hold_days = False;
             $correctOptionFound = False;
             $optionBuyPrice = -1.00;
             $finalOptionBuyPrice = -1;
             $daysToExpire = -1;
-            $counter = 0;
-            for ($counter = 0; $counter < count($list[$i]); $counter++){
-                //echo $counter." ";    
-                if ($counter == 0){
+			$counter = 0;
+			
+			for ($counter = 0; $counter < count($val); $counter++)
+			{
+				if ($counter == 0){
                     
-        //            echo intval($list[$i][$counter]-> daysToExp)." ";
-                    $theChosenOne = $list[$i][$counter];
-                    $optionBuyPrice = floatval($list[$i][$counter]->optAsk)*100;
-                    //dd(substr(explode("+\"strike\": \"", $list[$i][$counter])[1], 0, 5));
-                }
-                else{
+					$theChosenOne = $val[$counter];
+					$optionBuyPrice = floatval($val[$counter]->optAsk)*100;
+					//dd(substr(explode("+\"strike\": \"", $list[$i][$counter])[1], 0, 5));
+				}
+				else{
+					if (intval($val[$counter]-> daysToExp) <= $maxLength and intval($val[$counter]-> daysToExp) >= $minLength){
+						if ((floatval($val[$counter]->optAsk)*100) <= $amtForEachStock){
+								$theChosenOne = $val[$counter]; 
+							}
+							else{
+								break;
+							}
 
-//                    echo intval($list[$i][$counter]-> daysToExp)." ";
+					}
+				} 
+				$counter++;
+			}
+			$theChosenOnes[$key] = $theChosenOne;
 
+		}
+		return $theChosenOnes;
 
-/*
-*
-* Ask Don if we want to remove the min length and also work with only a mxaimum than having both
-*
-*/
-
-                    if (intval($list[$i][$counter]-> daysToExp) <= $maxLength and intval($list[$i][$counter]-> daysToExp) >= $minLength){
-                        if ((floatval($list[$i][$counter]->optAsk)*100) <= $amountPerStock){
-                                $theChosenOne = $list[$i][$counter]; 
-                            }
-                            else{
-                                break;
-                            }
-
-                    }
-                }   
-
-                $counter += 1;
-
-            }
-
-            array_push($theChosenOnes, $theChosenOne);
-
-        } 
-
-        return $theChosenOnes;
     }
 
 	// This takes in a list of options and gets the price history
@@ -178,12 +176,12 @@ class stocks extends Controller
 	{
 		$optionsFound = 0;
 		$counter = 0;
-
+		$callResults = array();
 		while($optionsFound < $maxTrade && $counter < count($stocks)) 
 		{
 			// You cannot use named bindings multiple times in the same query.
 			// There must be an individual named binding for each spot.
-			if($amountPerStock > $stocks[$counter]["price"])
+			if($stocks[$counter]["price"] < $amountPerStock)
 			{
 				$arguments = [
 					'date1' => $date,
@@ -221,7 +219,7 @@ class stocks extends Controller
 
 				$callResult = DB::connection('ovs')->select($query, $arguments);
 
-				$callResults[] = $callResult;
+				$callResults[$stocks[$counter]["name"]] = $callResult;
 				$optionsFound++;
 			}	
 
