@@ -42,6 +42,7 @@ class stocks extends Controller
 
 			// Get the options list for the first day
 			$optionList = $this->getOptionsList($stockResults, $date, $amountPerStock, $maxTrades);
+            dd($optionList);
 
 			// Choose the options near the strike price
 			$chosenOptions = $this->optionSelect($optionList, $maxTradeLength, $minTradeLength, $amountPerStock);
@@ -68,7 +69,7 @@ class stocks extends Controller
 				);
 				$values['information'][] = $newOption;
 			}
-
+            dd($newOption['priceHistory']->optId);
 
 			$amountSpentOnThisDay = 0;
 			$balance -= $amountSpentOnThisDay;
@@ -176,7 +177,7 @@ class stocks extends Controller
 
 	// This takes in a list of options and gets the price history
 	// from a start date to an end date.
-	private function getPriceHistory($option, $startDate, $endDate)
+	public function getPriceHistory($option, $startDate, $endDate)
 	{
 		$arguments = [
 			'optId' => $option->optId,
@@ -198,7 +199,7 @@ class stocks extends Controller
 		return $priceHistory;
 	}
 
-	private function getOptionsList($stocks, $date, $amountPerStock, $maxTrade)
+	public function getOptionsList($stocks, $date, $amountPerStock, $maxTrade)
 	{
 		$optionsFound = 0;
 		$counter = 0;
