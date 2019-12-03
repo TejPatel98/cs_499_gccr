@@ -12,15 +12,11 @@ canvas.onclick = function(evt) {
 
 function generateTable(point){
 
-    //*********************** 
-    // AJAX request to get data
-    //*********************** 
-
     // Put date and cash balance at top of table
-    var date = chartData.labels[point];
-    date = moment.utc(new Date(date)).format('MMMM Do, YYYY');
+    var date = Object.keys(results)[point]
+    document.getElementById('tableCash').innerHTML = 'Cash Balance: $' + (results[date].balance).toLocaleString();
+    date = moment.utc(date).format('MMMM Do, YYYY');
     document.getElementById('tableDate').innerHTML = date;
-    document.getElementById('tableCash').innerHTML = 'Cash Balance: $' + (Math.floor(Math.random() * (120000 - 90000 + 1) ) + 90000);
 
     var tbl = document.getElementById('resultTable');
     var tblBody = tbl.children[1];
@@ -36,7 +32,7 @@ function generateTable(point){
     var data = [];
     for(let i = 0; i < results[currentDay].information.length; i++){
         data.push({});
-        data[i].symbol = results[currentDay].information[i].optionId;
+        data[i].ticker = results[currentDay].information[i].name;
         data[i].purchaseDate = moment.utc(new Date(results[currentDay].information[i].purchaseDate)).format('MM/DD/YYYY');
         data[i].expireDate = moment.utc(new Date(results[currentDay].information[i].expDate)).format('MM/DD/YYYY');
         data[i].strike = "$" +(parseFloat(results[currentDay].information[i].strike).toFixed(2));

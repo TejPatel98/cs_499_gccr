@@ -82,18 +82,18 @@
 					<div class="row">
 						<div class="form-group col">
 							{!! Form::label('minTradeLength', 'Minimum Trading Length (Calendar Days)') !!}
-							{!! Form::number('minTradeLength', '', ['class' => 'form-control', 'min' => '14', 'max' => '38']) !!}
+							{!! Form::number('minTradeLength', '', ['class' => 'form-control', 'min' => '1']) !!}
 						</div>
 						<div class="form-group col">
 							{!! Form::label('maxTradeLength', 'Maximum Trading Length (Calendar Days)') !!}
-							{!! Form::number('maxTradeLength', '', ['class' => 'form-control', 'min' => '14', 'max' => '38']) !!}
+							{!! Form::number('maxTradeLength', '', ['class' => 'form-control', 'min' => '1']) !!}
 						</div>
 					</div>
 
 					<div class="row">
 						<div class="form-group col-sm">
 							<label for="startDate">Start Date</label>
-							<input type="date" id="startDate" name="startDate" class="form-control" min="2001-1-1" value="{{date('Y-m-d')}}">
+							<input type="date" id="startDate" name="startDate" class="form-control" min="2015-02-01" value="{{date('Y-m-d')}}">
 						</div>
 						<div class="form-group col-sm">
 							<label for="endDate">End Date</label>

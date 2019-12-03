@@ -1,17 +1,18 @@
-function generateChartData(){
-    data = []
-    for(let i = 0; i < 30; i++)
-        data.push(Math.floor(Math.random() * (400 - 15 + 1) ) + 15);
-    return data;
+// Function to get the portfolio value data for each point
+function getChartData(){
+    portfolioValues = []
+    Object.keys(results).forEach((date) => {
+        portfolioValues.push(results[date].portfolioValue);
+    });
+    return portfolioValues;
 }
 
 // Function to generate date labels for each point on chart
 function dateLabels(){
     var dateLabels = []
     Object.keys(results).forEach((date) => {
-        dateLabels.push(date);
+        dateLabels.push(moment.utc(new Date(date)).format('MMM Do'));
     });
-    console.log(dateLabels);
     return dateLabels;
 }
 
@@ -22,7 +23,7 @@ var chartOptions = {
         legend: {display: false},
         scales: {
             xAxes: [{
-                type: 'time',
+                type: 'category',
                 distribution: 'linear',
                 display: true,
                 scaleLabel: {
@@ -35,9 +36,6 @@ var chartOptions = {
                 },
             }],
             yAxes: [{
-                // ticks: {
-                //     beginAtZero: true,
-                // },
                 display: true,
                 scaleLabel: {
                     display: true,
@@ -49,12 +47,11 @@ var chartOptions = {
         }
     };
 var chartData = {
-        // labels: [new Date(2019, 11, 1), new Date(2019, 11, 2), new Date(2019, 11, 3), new Date(2019, 11, 4), new Date(2019, 11, 5), new Date(2019, 11, 6), new Date(2019, 11, 7), new Date(2019, 11, 8), new Date(2019, 11, 9), new Date(2019, 11, 10), new Date(2019, 11, 11), new Date(2019, 11, 12), new Date(2019, 11, 13), new Date(2019, 11, 14), new Date(2019, 11, 15), new Date(2019, 11, 16), new Date(2019, 11, 17), new Date(2019, 11, 18), new Date(2019, 11, 19), new Date(2019, 11, 20), new Date(2019, 11, 21), new Date(2019, 11, 22), new Date(2019, 11, 23), new Date(2019, 11, 24), new Date(2019, 11, 25), new Date(2019, 11, 26), new Date(2019, 11, 27), new Date(2019, 11, 28), new Date(2019, 11, 29), new Date(2019, 11, 30)],
         labels: dateLabels(),
         datasets: [{
             fill: false,
             label: '',
-            data: generateChartData(),
+            data: getChartData(),
             borderColor: '#1fce97',
             backgroundColor: '#1fce97',
             pointBorderColor: '#1c926d',
@@ -66,3 +63,34 @@ var chartData = {
         }] 
     };
 var chart = new Chart(ctx, {type: 'line', data: chartData, options: chartOptions});
+
+// Function to get end portfolio value and net gain/loss
+function getEndValue(){
+    var portfolioValueElement = document.getElementById("endPortfolioValue");
+    var netGainLossElement = document.getElementById("netGainLoss");
+    var netGainLossValueElement = document.getElementById("netGainLossValue");
+
+    var firstDay = Object.keys(results)[0];
+    var lastDay = Object.keys(results)[Object.keys(results).length-1];
+
+    var portfolioValue = results[lastDay].portfolioValue;
+    var netGainLoss = results[lastDay].portfolioValue - results[firstDay].balance;
+
+    var gainLoss = "";
+    if(netGainLoss >= 0){
+        gainLoss = "Net Gain: ";
+        netGainLossValueElement.style.color = "#1fce97";
+    }
+    else{
+        gainLoss = "Net Loss: "
+        netGainLossValueElement.style.color = "red";
+    }
+
+    portfolioValueElement.innerHTML = "Portfolio Value: $" + portfolioValue.toLocaleString();
+    netGainLossElement.innerHTML = gainLoss;
+    netGainLossValueElement.innerHTML = "$" + netGainLoss.toLocaleString();
+
+
+
+}
+getEndValue();
