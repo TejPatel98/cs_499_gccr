@@ -216,7 +216,7 @@ class stocks extends Controller
 			for ($counter = 0; $counter < count($val[0]); $counter++)
 			{
 				
-				if (intval($val[0][$counter]-> daysToExp) <= $maxLength and intval($val[0][$counter]-> daysToExp) >= 1){
+				if (intval($val[0][$counter]-> daysToExp) <= $maxLength and intval($val[0][$counter]-> daysToExp) >= $minLength){
 					if ((floatval($val[0][$counter]->optAsk)*100) <= $amtForEachStock){
 						$theChosenOne = $val[0][$counter]; 
 						$price = $val[1];
