@@ -9,6 +9,9 @@
         <div class="col">
             <h4 id="endPortfolioValue"></h4>
         </div>
+        <div class="col text-center">
+            <button type="button" style="margin-bottom:5px; margin-top:0px" class="btn btn-primary" onclick='downloadCSV({ filename: "portfolioResults.csv" });'>Download Results</button>
+        </div>
         <div class="col" style="text-align: right">
             <h4 id="netGainLoss"style="display:inline"></h4>
             <h4 id="netGainLossValue" style="display:inline"></h4>
@@ -46,5 +49,7 @@
 <script> var results = @json($results);  console.log(results); </script>
 <script src="{{URL('/js/chartSetup.js')}}"></script>
 <script src="{{URL('/js/resultTable.js')}}"></script>
+<script src="{{URL('/js/downloadData.js')}}"></script>
+
 
 @endsection

@@ -38,8 +38,8 @@ function generateTable(point){
         data[i].strike = "$" +(parseFloat(results[currentDay].information[i].strike).toFixed(2));
         data[i].purchasePrice = "$" +(results[currentDay].information[i].amountSpent.toFixed(2));
         data[i].numContractsOwned = results[currentDay].information[i].numberOfOptions;
-        data[i].currentPrice = "$" +(results[currentDay].information[i].priceHistory[0].bid);
-        data[i].currentValue = "$" +((data[i].numContractsOwned * results[currentDay].information[i].priceHistory[0].bid * 100).toFixed(2));
+        data[i].currentPrice = "$" + parseFloat(results[currentDay].information[i].bid).toFixed(2);
+        data[i].currentValue = "$" +((data[i].numContractsOwned * results[currentDay].information[i].bid * 100).toFixed(2));
 
 
     }// **************************************************************************************
