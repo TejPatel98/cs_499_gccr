@@ -56,7 +56,7 @@
 
 						<div class="form-group col-sm">
 							{!! Form::label('scan', 'Scan') !!}
-							{!! Form::select('scan', array('scan_one' => 'Scan One', 'scan_two' => 'Scan Two', 'scan_three' => 'Scan Three'), '', ['class' => 'form-control']) !!}
+							{!! Form::select('scan', array('VolitilityHVIVDifference' => 'Volatility HV-IV Difference', 'TermLTSTDifference' => 'Term LT-ST Difference'), '', ['class' => 'form-control']) !!}
 						</div>
 					</div>
 

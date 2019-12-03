@@ -18,6 +18,7 @@ class stocks extends Controller
 		$maxTrades = $request->input('maxTradesPerDay');
 		$startDate = $request->input('startDate');
 		$endDate = $request->input('endDate');
+		$scanType = $request->input('scan');
 		$maxTradeLength = $request->input('maxTradeLength');
 		$minTradeLength = $request->input('minTradeLength');		
 
@@ -38,7 +39,10 @@ class stocks extends Controller
 			$amountSpentOnThisDay = 0;
 
 			// Get the scan results for the first day
-			$stockResults = \FSSCLE::VolitilityHVIVDifference($date);
+			if($scanType == 'VolitilityHVIVDifference')
+				$stockResults = \FSSCLE::VolitilityHVIVDifference($date);
+			else if($scanType == 'TermLTSTDifference')
+				$stockResults = \FSSCLE::TermLTSTDifference($date);
 
 			// Get the options list for the first day
 			$optionList = $this->getOptionsList($stockResults, $date, $amountPerStock, $maxTrades);
