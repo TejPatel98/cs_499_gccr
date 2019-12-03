@@ -7,11 +7,11 @@
     <canvas id="chart-canvas" style="margin: 0 auto; padding: 10px"></canvas>
     <div class="row" style="border-bottom: 2px solid black">
         <div class="col">
-            <h4 id="endPortfolioValue" class="float-left" style="text-align: center"></h4>
+            <h4 id="endPortfolioValue"></h4>
         </div>
-        <div class="col">
-            <h4 id="netGainLossValue" class="float-right"></h4>
-            <h4 id="netGainLoss" class="float-right" style="margin-right: 4px"></h4>
+        <div class="col" style="text-align: right">
+            <h4 id="netGainLoss"style="display:inline"></h4>
+            <h4 id="netGainLossValue" style="display:inline"></h4>
         </div>
     </div>
     <br>
