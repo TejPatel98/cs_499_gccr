@@ -42,7 +42,6 @@ class stocks extends Controller
 
 			// Get the options list for the first day
 			$optionList = $this->getOptionsList($stockResults, $date, $amountPerStock, $maxTrades);
-            dd($optionList);
 
 			// Choose the options near the strike price
 			$chosenOptions = $this->optionSelect($optionList, $maxTradeLength, $minTradeLength, $amountPerStock);
@@ -69,7 +68,6 @@ class stocks extends Controller
 				);
 				$values['information'][] = $newOption;
 			}
-            dd($newOption['priceHistory']->optId);
 
 			$amountSpentOnThisDay = 0;
 			$balance -= $amountSpentOnThisDay;
@@ -85,6 +83,7 @@ class stocks extends Controller
 			$valForToday = $this->getSpecificDayValue($portfolioValue, $date);
 			$data[$date]["portfolioValue"] = $valForToday;
 		}
+        dd($data);
 
 		$viewData = [
 			'results' => $data,
@@ -102,7 +101,7 @@ class stocks extends Controller
 	 * need to add the sell functionality and hten compute portoflio value 
 	 *
 	 */
-	private function getPortfolioValue ($data)
+	public function getPortfolioValue ($data)
 	{
 		$chosenOptionsThroughout = array();
 		foreach($data as $key=> $value)
@@ -115,7 +114,7 @@ class stocks extends Controller
 		return $chosenOptionsThroughout;
 	}
 
-	private function getSpecificDayValue($portfolioVal, $date)
+	public function getSpecificDayValue($portfolioVal, $date)
 	{
 		$portfolioValueForToday = 0;
 		foreach ($portfolioVal as $optionVals)
@@ -134,7 +133,7 @@ class stocks extends Controller
 
 
 
-	private function optionSelect($list, $maxLength, $minLength, $amtForEachStock)
+	public function optionSelect($list, $maxLength, $minLength, $amtForEachStock)
 	{
 		$theChosenOnes = array();
 
@@ -156,7 +155,7 @@ class stocks extends Controller
 					$optionBuyPrice = floatval($val[$counter]->optAsk)*100;
 				}
 				else{
-					if (intval($val[$counter]-> daysToExp) <= $maxLength and intval($val[$counter]-> daysToExp) >= $minLength){
+					if (intval($val[$counter]-> daysToExp) <= $maxLength and intval($val[$counter]-> daysToExp) >=  1){
 						if ((floatval($val[$counter]->optAsk)*100) <= $amtForEachStock){
 							$theChosenOne = $val[$counter]; 
 						}
