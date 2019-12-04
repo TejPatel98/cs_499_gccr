@@ -14,4 +14,3 @@ tags
 tags.lock
 tags.temp
 *.swp
-package-lock.json

@@ -12,7 +12,7 @@
 */
 
 Route::get('/', function () {
-    return view('stocks/select');
+    return view('welcome');
 })->name('home');
 
 Route::view('/stock', 'stocks/select')->name('stock.select');
