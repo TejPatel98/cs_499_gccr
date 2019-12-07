@@ -46,6 +46,17 @@
 		<div class="card-body">
 			<div class="row">
 				<div class="col">
+					@if ($errors->any())
+					<div class="row">
+						<div class="alert alert-danger">
+							<ul>
+								@foreach ($errors->all() as $error)
+									<li>{{ $error }}</li>
+								@endforeach
+							</ul>
+						</div>
+					</div>
+					@endif
 					{!! Form::open(array('url' => '/stock/submit', 'id' => 'portfolioSetup')) !!}
 
 					<div class="row">
