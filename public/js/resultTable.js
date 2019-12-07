@@ -35,7 +35,12 @@ function generateTable(point){
         data[i].ticker = results[currentDay].information[i].name;
         data[i].purchaseDate = moment.utc(new Date(results[currentDay].information[i].purchaseDate)).format('MM/DD/YYYY');
         data[i].expireDate = moment.utc(new Date(results[currentDay].information[i].expDate)).format('MM/DD/YYYY');
+        data[i].putCall = results[currentDay].putCall;
+        data[i].beginCashBalance = "$" + results[currentDay].balance.toFixed(2);
+        data[i].endCashBalance = "$" + results[currentDay].finalBalance.toFixed(2);
+        data[i].stockPurchasePrice = "$" + (results[currentDay].information[i].stockPrice).toFixed(2); 
         data[i].strike = "$" +(parseFloat(results[currentDay].information[i].strike).toFixed(2));
+        data[i].stockClose = "$" + (parseFloat(results[currentDay].information[i].sclose).toFixed(2));
         data[i].purchasePrice = "$" +(results[currentDay].information[i].amountSpent.toFixed(2));
         data[i].numContractsOwned = results[currentDay].information[i].numberOfOptions;
         data[i].currentPrice = "$" + parseFloat(results[currentDay].information[i].bid).toFixed(2);
@@ -49,7 +54,7 @@ function generateTable(point){
     for(let i = 0; i < results[currentDay].information.length; i++){
         var row =  document.createElement('tr');
         var values = Object.values(data[i]);
-        for(let j = 0; j < 8 ; j++){
+        for(let j = 0; j < 13; j++){
             var td = document.createElement('td');
             td.innerHTML = values[j];
             row.appendChild(td);

@@ -33,7 +33,12 @@
                 <th scope="col">Ticker</th>
                 <th scope="col">Purchase Date</th>
                 <th scope="col">Expire</th>
+                <th scope="col">Call/Put</th>
+                <th scope="col">Begin Cash Balance</th>
+                <th scope="col">End Cash Balance</th>
+                <th scope="col">Stock Purchase Price</th>
                 <th scope="col">Strike</th>
+                <th scope="col">Stock Close</th>
                 <th scope="col">Purchase Price</th>
                 <th scope="col">Number of Contracts</th>
                 <th scope="col">Current Price</th>

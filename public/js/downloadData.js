@@ -6,16 +6,19 @@ function formatData(){
         for (let j = 0; j < results[index].information.length; j++){
             data.push({});
             data[x].date = Object.keys(results)[i]; 
-            data[x].portfolioValue = results[index].portfolioValue;
-            data[x].cashBalance = results[index].balance;
+            data[x].beginCashBalance = results[index].balance;
+            data[x].endCashBalance = results[index].finalBalance;
             data[x].ticker = results[index].information[j].name;
             data[x].purchaseDate = moment.utc(new Date(results[index].information[j].purchaseDate)).format('MM/DD/YYYY');
             data[x].expire = moment.utc(new Date(results[index].information[j].expDate)).format('MM/DD/YYYY');
+            data[x].stockPurchasePrice = results[index].information[j].stockPrice.toFixed(2); 
             data[x].strike = results[index].information[j].strike;
+            data[x].stockClose = parseFloat(results[index].information[j].sclose).toFixed(2);
             data[x].purchasePrice = results[index].information[j].amountSpent;
             data[x].numberOfContracts = results[index].information[j].numberOfOptions;
             data[x].currentPrice = results[index].information[j].bid;
             data[x].currentValue = results[index].information[j].currentValue.toFixed(2);
+            data[x].portfolioValue = results[index].portfolioValue;
             x += 1;
         }
     }

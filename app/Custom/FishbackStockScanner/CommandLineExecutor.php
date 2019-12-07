@@ -43,6 +43,7 @@ class CommandLineExecutor
 		$command_parts[] = "-validBids";
 		$command_parts[] = "-minStockPrice=5";
 		$command_parts[] = "-noETF";
+		$command_parts[] = "|sort -t, -k4,4 -nr";
 
 		$command = implode(" ", $command_parts);
 
@@ -99,6 +100,7 @@ class CommandLineExecutor
 		$command_parts[] = "-validBids";
 		$command_parts[] = "-minStockPrice=5";
 		$command_parts[] = "-noETF";
+		$command_parts[] = "|sort -t, -k4,4 -nr";
 
 		$command = implode(" ", $command_parts);
 
