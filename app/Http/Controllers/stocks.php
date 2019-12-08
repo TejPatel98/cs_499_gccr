@@ -48,7 +48,7 @@ class stocks extends Controller
 			$stockResults = \FSSCLE::VolitilityHVIVDifference($date);
 
 			// Get the options list for the first day
-			$optionList = $this->getOptionsList($stockResults, $date, $amountPerStock, $requestData['maxTradesPerDay']);
+			$optionList = $this->getOptionsList($stockResults, $date, $amountPerStock, $requestData['maxTradesPerDay'], $requestData['strategy']);
 
 			// Choose the options near the strike price
 			$chosenOptions = $this->optionSelect($optionList, $requestData['maxTradeLength'], $requestData['minTradeLength'], $amountPerStock);
@@ -96,7 +96,7 @@ class stocks extends Controller
 		// updates portfolio value and balance
 		for ($i = 0; $i < count($formattedDates); $i++)
 		{
-			$valForToday = $this->getSpecificDayValue($portfolioValue, $formattedDates[$i]);
+			$valForToday = $this->getSpecificDayValue($portfolioValue, $formattedDates[$i], $requestData['strategy']);
 			$data[$formattedDates[$i]]["portfolioValue"] = $data[$formattedDates[$i]]["balance"] + $valForToday[1];
 			$temp = $data[$formattedDates[$i]]['finalBalance'];
 			$data[$formattedDates[$i]]["fBalance"] = $temp + $valForToday[0];
@@ -137,11 +137,10 @@ class stocks extends Controller
 		return $chosenOptionsThroughout;
 	}
 
-	private function getSpecificDayValue($portfolioVal, $date)
+	private function getSpecificDayValue($portfolioVal, $date, $putCall)
 	{
 		$balanceValueAddition = 0;
 		$portfolioValueForToday = 0;
-		// dd($portfolioVal);
 		foreach ($portfolioVal as $optionVals)
 		{
 			if($optionVals['expDate'] > $date)
@@ -157,13 +156,16 @@ class stocks extends Controller
 				{
 					$optPriceHistoryDate = (new \DateTime($priceHistoryVar->date_))->format('Y-m-d');
 					if ($optPriceHistoryDate == $date)
-						$balanceValueAddition += max(floatval($priceHistoryVar->sclose) - floatval($optionVals['strike']), 0)*100*$optionVals['numberOfOptions'];
+					{
+						if($putCall == 'C')
+							$balanceValueAddition += max(floatval($priceHistoryVar->sclose) - floatval($optionVals['strike']), 0)*100*$optionVals['numberOfOptions'];
+						else if($putCall == 'P')
+							$balanceValueAddition += max(floatval($optionVals['strike']) - floatval($priceHistoryVar->sclose), 0)*100*$optionVals['numberOfOptions'];
+					}
 				}
-
-				
 			}
-
 		}
+
 		return array($balanceValueAddition,$portfolioValueForToday);
 	}
 
@@ -278,7 +280,7 @@ class stocks extends Controller
 		return $priceHistory;
 	}
 
-	private function getOptionsList($stocks, $date, $amountPerStock, $maxTrade)
+	private function getOptionsList($stocks, $date, $amountPerStock, $maxTrade, $putCall)
 	{
 		$optionsFound = 0;
 		$counter = 0;
@@ -291,7 +293,7 @@ class stocks extends Controller
 				'date3' => $date,
 				'days_to_exp' => 5,
 				'eq_id' => $stocks[$counter]['id'],
-				'p_c' => 'C',
+				'p_c' => $putCall,
 			];
 
 			$query = '
