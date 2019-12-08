@@ -7,7 +7,7 @@ function formatData(){
             data.push({});
             data[x].date = Object.keys(results)[i]; 
             data[x].beginCashBalance = results[index].balance;
-            data[x].endCashBalance = results[index].finalBalance;
+            data[x].endCashBalance = results[index].fBalance;
             data[x].ticker = results[index].information[j].name;
             data[x].purchaseDate = moment.utc(new Date(results[index].information[j].purchaseDate)).format('MM/DD/YYYY');
             data[x].expire = moment.utc(new Date(results[index].information[j].expDate)).format('MM/DD/YYYY');

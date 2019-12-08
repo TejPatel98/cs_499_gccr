@@ -86,15 +86,23 @@ class stocks extends Controller
 		}	
 		// calculates portfolio value 
 		$portfolioValue = $this->getPortfolioValue($data);
-
+		$updatedFinalBalance = array();
 		// updates portfolio value and balance
-		foreach($formattedDates as $date)
+		for ($i = 0; $i < count($formattedDates); $i++)
 		{
-			$valForToday = $this->getSpecificDayValue($portfolioValue, $date);
-			$data[$date]["portfolioValue"] = $data[$date]["balance"] + $valForToday[1];
-			$data[$date]["finalBalance"] +=  $valForToday[0];
+			$valForToday = $this->getSpecificDayValue($portfolioValue, $formattedDates[$i]);
+			$data[$formattedDates[$i]]["portfolioValue"] = $data[$formattedDates[$i]]["balance"] + $valForToday[1];
+			$temp = $data[$formattedDates[$i]]['finalBalance'];
+			$data[$formattedDates[$i]]["fBalance"] = $temp + $valForToday[0];
+			if ($i < count($formattedDates) - 1 && $valForToday[0] > 0)
+			{
+				$updatedFinalBalance[$formattedDates[$i+1]] = $temp + $valForToday[0];
+			}
 		}
-
+		foreach ($updatedFinalBalance as $key=> $value)
+		{
+			$data[$key]['balance']=floatval($value);
+		}
 		// added options for each day to information rather than just having what we bough on that day
 		$optionDateData = $this->getoptionDataForEachDay($data, $formattedDates);
 
@@ -103,7 +111,6 @@ class stocks extends Controller
 			unset($data[$date]['information']);
 			$data[$date]['information'] = $optionDateData[$date];
 		}
-
 		$viewData = [
 			'results' => $data,
 		];

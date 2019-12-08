@@ -37,7 +37,7 @@ function generateTable(point){
         data[i].expireDate = moment.utc(new Date(results[currentDay].information[i].expDate)).format('MM/DD/YYYY');
         data[i].putCall = results[currentDay].putCall;
         data[i].beginCashBalance = "$" + results[currentDay].balance.toFixed(2);
-        data[i].endCashBalance = "$" + results[currentDay].finalBalance.toFixed(2);
+        data[i].endCashBalance = "$" + results[currentDay].fBalance.toFixed(2);
         data[i].stockPurchasePrice = "$" + (results[currentDay].information[i].stockPrice).toFixed(2); 
         data[i].strike = "$" +(parseFloat(results[currentDay].information[i].strike).toFixed(2));
         data[i].stockClose = "$" + (parseFloat(results[currentDay].information[i].sclose).toFixed(2));
