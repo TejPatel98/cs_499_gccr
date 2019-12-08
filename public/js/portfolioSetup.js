@@ -41,7 +41,7 @@ var validate = function(event){
         maxTradeLength.classList.add('is-invalid');
         maxTradeLength.addEventListener("change", removeInvalidClass);
     }
-    if (minTradeLength.value >= maxTradeLength.value){
+    if (parseInt(minTradeLength.value) >= parseInt(maxTradeLength.value)){
         err += "* Minimum Trading Length must be less than Maximum Trading Length <br>";
         maxTradeLength.classList.add('is-invalid');
         maxTradeLength.addEventListener("change", removeInvalidClass);
