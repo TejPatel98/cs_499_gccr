@@ -13,16 +13,21 @@ class stocks extends Controller
 {
 	public function submitSelection(Request $request)
 	{
-		// Setup variables
-		$invAmount = $request->input('principle') * ($request->input('investmentPercent') * 0.01);
-		$maxTrades = $request->input('maxTradesPerDay');
-		$putCall = strtoupper(explode('_', $request->input('strategy'))[1]);
-		$startDate = $request->input('startDate');
-        $endDate = $request->input('endDate');
-		$maxTradeLength = $request->input('maxTradeLength');
-		$minTradeLength = $request->input('minTradeLength');		
+		// Validate variables
+        $requestData = $request->validate([
+			'principle' => 'required',
+			'investmentPercent' => 'required',
+			'maxTradesPerDay' => 'required',
+			'startDate' => 'required',
+			'endDate' => 'required',
+			'maxTradeLength' => 'required',
+			'minTradeLength' => 'required',
+			'strategy' => 'required',
+        ]);
+		
+		$invAmount = $requestData['principle'] * $requestData['investmentPercent'];
 
-		$dateResults = DB::connection('ovs')->select("SELECT * FROM `ovscalendar` where calType = '2' and date_ BETWEEN ? and ? order by date_ asc", [$startDate, $endDate]);
+		$dateResults = DB::connection('ovs')->select("SELECT * FROM `ovscalendar` where calType = '2' and date_ BETWEEN ? and ? order by date_ asc", [$requestData['startDate'], $requestData['endDate']]);
 
 		// Format all the date results to YYYY-MM-DD ex 2000-01-01
 		foreach($dateResults as $result)
@@ -34,7 +39,7 @@ class stocks extends Controller
 		$data = array();
 		foreach($formattedDates as $date)
 		{
-			$amountPerStock = $balance * ($request->input('investmentPercent') * 0.01) * pow($maxTrades, -1);
+			$amountPerStock = $balance * ($request->input('investmentPercent') * 0.01) * pow($requestData['maxTradesPerDay'], -1);
 
 
 			$amountSpentOnThisDay = 0;
@@ -43,15 +48,16 @@ class stocks extends Controller
 			$stockResults = \FSSCLE::VolitilityHVIVDifference($date);
 
 			// Get the options list for the first day
-			$optionList = $this->getOptionsList($stockResults, $date, $amountPerStock, $maxTrades);
-			
+			$optionList = $this->getOptionsList($stockResults, $date, $amountPerStock, $requestData['maxTradesPerDay']);
+
 			// Choose the options near the strike price
-			$chosenOptions = $this->optionSelect($optionList, $maxTradeLength, $minTradeLength, $amountPerStock);
+			$chosenOptions = $this->optionSelect($optionList, $requestData['maxTradeLength'], $requestData['minTradeLength'], $amountPerStock);
+
 			$values = array(
 				'balance' => intval($balance),
 				'invAmount' => $balance * ($request->input('investmentPercent') * 0.01),
 				'amountForEachStock' => $amountPerStock,
-				'putCall' => $putCall,
+				'putCall' => $requestData['strategy'],
 				'information' => array()
 			);
 			$amountSpentToday = 0;
@@ -72,7 +78,7 @@ class stocks extends Controller
 							'pricePerOption' => $value[0]->optAsk*100,
 							'numberOfOptions' => floor($amountPerStock * pow($value[0]->optAsk*100, -1)),
 							'amountSpent' => $value[0]->optAsk*100 * floor($amountPerStock * pow($value[0]->optAsk*100, -1)),
-							'priceHistory' => $this->getPriceHistory($value[0], $date, $endDate)[$value[0]->optId]
+							'priceHistory' => $this->getPriceHistory($value[0], $date, $requestData['endDate'])[$value[0]->optId]
 						);
 						$values['information'][] = $newOption;
 					}
@@ -116,8 +122,6 @@ class stocks extends Controller
 		];
 		
 		return view('results/results', $viewData);
-
-
 	}
 
 	private function getPortfolioValue ($data)

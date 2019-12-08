@@ -46,12 +46,23 @@
 		<div class="card-body">
 			<div class="row">
 				<div class="col">
+					@if ($errors->any())
+					<div class="row">
+						<div class="alert alert-danger">
+							<ul>
+								@foreach ($errors->all() as $error)
+									<li>{{ $error }}</li>
+								@endforeach
+							</ul>
+						</div>
+					</div>
+					@endif
 					{!! Form::open(array('url' => '/stock/submit', 'id' => 'portfolioSetup')) !!}
 
 					<div class="row">
 						<div class="form-group col-sm">
 							{!! Form::label('strategy', 'Strategy') !!}
-							{!! Form::select('strategy', array('strategy_call' => 'Buy Call', 'strategy_put' => 'Buy Put'), '', ['class' => 'form-control']) !!}
+							{!! Form::select('strategy', array('C' => 'Buy Call', 'P' => 'Buy Put'), '', ['class' => 'form-control']) !!}
 						</div>
 
 						<div class="form-group col-sm">
