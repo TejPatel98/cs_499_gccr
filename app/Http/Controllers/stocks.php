@@ -97,13 +97,13 @@ class stocks extends Controller
 		for ($i = 0; $i < count($formattedDates); $i++)
 		{
 			$valForToday = $this->getSpecificDayValue($portfolioValue, $formattedDates[$i], $requestData['strategy']);
-			$data[$formattedDates[$i]]["portfolioValue"] = $data[$formattedDates[$i]]["balance"] + $valForToday[1];
 			$temp = $data[$formattedDates[$i]]['finalBalance'];
 			$data[$formattedDates[$i]]["fBalance"] = $temp + $valForToday[0];
 			if ($i < count($formattedDates) - 1 && $valForToday[0] > 0)
 			{
 				$updatedFinalBalance[$formattedDates[$i+1]] = $temp + $valForToday[0];
 			}
+			$data[$formattedDates[$i]]["portfolioValue"] = $data[$formattedDates[$i]]["fBalance"] + $valForToday[1];
 		}
 		foreach ($updatedFinalBalance as $key=> $value)
 		{
